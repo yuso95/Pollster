@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,7 +17,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Notification
+        
+        let settings = UIUserNotificationSettings(types: [.alert,.badge,.sound], categories: nil)
+        application.registerUserNotificationSettings(settings)
+        application.registerForRemoteNotifications()
         return true
+    }
+    
+    // Notification
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        
+        // Cloud Querying Notification
+        
+        let ckqn = CKQueryNotification(fromRemoteNotificationDictionary: userInfo as! [String: NSObject])
+        let notification = NSNotification(name: NSNotification.Name(rawValue: CloudKitNotifications.NotificationRecieved), object: self, userInfo: [CloudKitNotifications.NotificationKey: ckqn])
+        
+        NotificationCenter.default.post(notification as Notification)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
